@@ -22,6 +22,8 @@ Set these values in `.env` before starting the app:
 - `SLACK_BOT_TOKEN`: required to run the Slack app.
 - `SLACK_APP_TOKEN`: required to run the Slack app in Socket Mode.
 
+The current code expects the SQLite database file at `data/seed/synthetic_startup.sqlite`. If the file is missing, restore or place it there before starting the app.
+
 ### 2. Create the Slack app tokens
 
 To get `SLACK_BOT_TOKEN` and `SLACK_APP_TOKEN`, create or open your Slack app at:
