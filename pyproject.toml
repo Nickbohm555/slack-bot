@@ -1,0 +1,36 @@
+[project]
+name = "synthetic-startup-app"
+version = "0.1.0"
+description = "Containerized SQLite service for the applied AI take-home database."
+requires-python = ">=3.12"
+dependencies = [
+    "deepagents>=0.4.12",
+    "langchain>=1.2.15",
+    "langchain-openai>=0.3.35",
+    "langgraph>=1.1.9",
+    "langgraph-checkpoint-postgres>=2.0.0",
+    "openpyxl>=3.1.5",
+    "pydantic>=2.13.3",
+    "pydantic-settings>=2.14.0",
+    "psycopg[binary]>=3.3.3",
+    "psycopg-pool>=3.3.0",
+    "python-dotenv>=1.2.2",
+    "pytest>=9.0.3",
+    "sqlalchemy>=2.0.44",
+    "slack-bolt>=1.28.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/agents",
+    "src/api_service",
+    "src/config",
+    "src/database",
+    "src/evals",
+    "src/research_auto",
+    "src/tools",
+]

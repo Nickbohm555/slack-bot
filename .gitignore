@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+.env
+.autoresearch/
+.pytest_cache/
+AGENTS.md
+CLAUDE.md

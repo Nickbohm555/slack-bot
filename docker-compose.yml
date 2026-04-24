@@ -1,0 +1,77 @@
+services:
+  api-service:
+    build:
+      context: .
+      dockerfile: src/api_service/Dockerfile
+    container_name: api-service
+    environment:
+      DB_PATH: /workspace/data/seed/synthetic_startup.sqlite
+      POSTGRES_DSN: postgresql://app:app@postgres:5432/app
+      POSTGRES_MIN_CONN_SIZE: 1
+      POSTGRES_MAX_CONN_SIZE: 4
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
+      SINGLE_AGENT_MODEL_PROVIDER: ${SINGLE_AGENT_MODEL_PROVIDER:-openai}
+      SINGLE_AGENT_MODEL: ${SINGLE_AGENT_MODEL:-gpt-4.1-mini}
+    command: ["uv", "run", "--no-sync", "python", "-m", "api_service.main"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+  evals:
+    build:
+      context: .
+      dockerfile: src/evals/Dockerfile
+    container_name: api-evals
+    profiles: ["evals"]
+    environment:
+      DB_PATH: /workspace/data/seed/synthetic_startup.sqlite
+      POSTGRES_DSN: postgresql://app:app@postgres:5432/app
+      POSTGRES_MIN_CONN_SIZE: 1
+      POSTGRES_MAX_CONN_SIZE: 4
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SINGLE_AGENT_MODEL_PROVIDER: ${SINGLE_AGENT_MODEL_PROVIDER:-openai}
+      SINGLE_AGENT_MODEL: ${SINGLE_AGENT_MODEL:-gpt-4.1-mini}
+      EVAL_SCORER_MODEL_PROVIDER: ${EVAL_SCORER_MODEL_PROVIDER:-openai}
+      EVAL_SCORER_MODEL: ${EVAL_SCORER_MODEL:-gpt-4.1-mini}
+    command:
+      [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "evals.main",
+        "--cases",
+        "/workspace/benchmarks/example_queries.json",
+        "--output",
+        "/workspace/benchmarks/example_queries_results.csv"
+      ]
+    volumes:
+      - ./.autoresearch:/workspace/.autoresearch
+      - ./benchmarks:/workspace/benchmarks
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:18.3
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+      PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
