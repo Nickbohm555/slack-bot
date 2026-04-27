@@ -1,5 +1,7 @@
 # slack-bot architecture
 
+For the new and much improved version of this project, go to [slack-bot-2](https://github.com/Nickbohm555/slack-bot-2), which includes filesystem management logic along with better AI engineering principles that I will discuss further.
+
 ## Demo
 
 The screen recording below shows a back-and-forth conversation with the Slack bot:
